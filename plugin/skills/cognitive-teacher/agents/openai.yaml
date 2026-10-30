@@ -1,0 +1,4 @@
+interface:
+  display_name: "Cognitive Teacher"
+  short_description: "Generate a teaching HTML doc (intuition, figures, code reading, quiz) for a change or system"
+  default_prompt: "Use $cognitive-teacher for this task."

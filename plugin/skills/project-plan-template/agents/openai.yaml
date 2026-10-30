@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Plan Template"
+  short_description: "Draft or audit a project plan backward from the final presentation"
+  default_prompt: "Use $project-plan-template to draft or review this project plan."

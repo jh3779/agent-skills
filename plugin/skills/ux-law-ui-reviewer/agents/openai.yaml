@@ -1,0 +1,4 @@
+interface:
+  display_name: "UX Law UI Reviewer"
+  short_description: "Review a UI against 5 UX laws and keep dated HTML review records"
+  default_prompt: "Use $ux-law-ui-reviewer to review this screen with Hick's, Fitts's, Jakob's, proximity and Von Restorff laws and save a dated HTML review."

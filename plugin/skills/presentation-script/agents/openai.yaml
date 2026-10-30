@@ -1,0 +1,4 @@
+interface:
+  display_name: "Presentation Script"
+  short_description: "Write a conclusion-first talk script, timing, Q&A bank and checklists"
+  default_prompt: "Use $presentation-script to prepare the script for this presentation."

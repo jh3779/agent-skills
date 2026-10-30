@@ -1,0 +1,4 @@
+interface:
+  display_name: "Structure Audit"
+  short_description: "Audit separation of concerns and file organization with evidence (read-only)"
+  default_prompt: "Use $structure-audit for this task."

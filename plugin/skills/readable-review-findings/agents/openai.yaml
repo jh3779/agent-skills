@@ -1,0 +1,4 @@
+interface:
+  display_name: "Readable Review Findings"
+  short_description: "Write review findings so a junior developer can read them as-is"
+  default_prompt: "Use $readable-review-findings for this task."

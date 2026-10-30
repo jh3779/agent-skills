@@ -1,0 +1,4 @@
+interface:
+  display_name: "Plan Gap Interview"
+  short_description: "Audit an existing plan for unresolved decisions, then interview to close them"
+  default_prompt: "Use $plan-gap-interview to audit our existing planning docs for undecided or unconfirmed items and interview me to resolve them."

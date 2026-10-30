@@ -1,0 +1,4 @@
+interface:
+  display_name: "Split Instructions"
+  short_description: "Split a large instruction/spec doc into tagged, per-task files with an index"
+  default_prompt: "Use $split-instructions to split a large instruction document into tagged per-task files with an INDEX.md."

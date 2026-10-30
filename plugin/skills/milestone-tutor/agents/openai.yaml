@@ -1,0 +1,4 @@
+interface:
+  display_name: "Milestone Tutor"
+  short_description: "Teach a topic milestone by milestone with mid/final assessments and re-teaching"
+  default_prompt: "Use $milestone-tutor for this task."

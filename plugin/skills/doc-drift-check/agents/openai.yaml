@@ -1,0 +1,4 @@
+interface:
+  display_name: "Doc Drift Check"
+  short_description: "Check that file:line citations in markdown docs still match the codebase"
+  default_prompt: "Use $doc-drift-check for this task."

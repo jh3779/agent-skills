@@ -1,0 +1,15 @@
+{
+  "name": "agent-skills",
+  "version": "0.1.0",
+  "description": "코드·설계 점검, 학습, 기획·발표, 세션 인계용 Codex 스킬 13종",
+  "author": { "name": "jh3779" },
+  "license": "MIT",
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Agent Skills",
+    "shortDescription": "Audits, reviews, learning, planning and handoff skills",
+    "developerName": "jh3779",
+    "category": "Productivity",
+    "capabilities": ["Interactive", "Write"]
+  }
+}

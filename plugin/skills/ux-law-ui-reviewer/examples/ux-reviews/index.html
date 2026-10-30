@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>UX 리뷰 기록</title>
+<!-- ux-law-ui-reviewer 기록 인덱스. 새 리뷰는 ROWS 주석 바로 아래에 tr 한 줄을 추가한다(최신이 위). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: 날짜순 리뷰 대장 — 한 줄 = 리뷰 파일 하나 */
+:root{--bg:#f4f6f8;--surface:#fff;--sunken:#eef1f5;--ink:#18212c;--muted:#5a6676;--line:#d9dfe7;--accent:#2b4fa8;
+  --crit:#b42318;--crit-bg:#fdecea;--high:#b54708;--high-bg:#fdf0e2;--med:#7f6200;--med-bg:#f9f1d3;
+  --sans:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11161d;--surface:#18202a;--sunken:#0d1218;--ink:#e6ebf2;--muted:#9aa6b6;--line:#2b3644;--accent:#8fb0ff;
+  --crit:#ff8f84;--crit-bg:#3a1916;--high:#ffb36e;--high-bg:#382413;--med:#e6c65c;--med-bg:#302810;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#11161d;--surface:#18202a;--sunken:#0d1218;--ink:#e6ebf2;--muted:#9aa6b6;--line:#2b3644;--accent:#8fb0ff;
+  --crit:#ff8f84;--crit-bg:#3a1916;--high:#ffb36e;--high-bg:#382413;--med:#e6c65c;--med-bg:#302810;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans)}
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px;padding-block:32px 64px;display:grid;gap:20px}
+h1{margin:0;font-size:24px}
+.label{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+p{margin:0;color:var(--muted);font-size:14px}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:6px}
+table{border-collapse:collapse;width:100%;min-width:720px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+th{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--sunken)}
+td.date{font:13px var(--mono);white-space:nowrap;font-variant-numeric:tabular-nums}
+td a{color:var(--accent);font-weight:500}
+td a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.n{display:inline-block;font:500 12px var(--mono);padding:1px 7px;border-radius:999px;margin:0 4px 4px 0;white-space:nowrap}
+.n.c{color:var(--crit);background:var(--crit-bg)}.n.h{color:var(--high);background:var(--high-bg)}.n.m{color:var(--med);background:var(--med-bg)}
+.n:not(.c):not(.h):not(.m){color:var(--muted);background:var(--sunken)}
+.verdict{font-size:14px;max-width:46ch}
+.src{font:12px var(--mono);color:var(--muted)}
+@media (max-width:640px){.wrap{padding-inline:16px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <span class="label">UX Law Review</span>
+  <h1>UX 리뷰 기록</h1>
+  <p>리뷰 한 건마다 파일 하나. 같은 화면을 다시 검토하면 새 날짜 파일이 추가되고 이전 파일은 그대로 남습니다.</p>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>날짜</th><th>화면</th><th>문제</th><th>한줄 평가</th><th>입력</th></tr></thead>
+      <tbody>
+<!-- ROWS (최신이 위) -->
+<tr><td class="date">2026-10-04</td><td><a href="2026-10-04_mobile-arpg-hud.html">모바일 액션 RPG 전투 HUD</a></td><td><span class="n c">C 1</span><span class="n h">H 2</span><span class="n m">M 3</span><span class="n">S 1</span></td><td class="verdict">공격 버튼 위 마을 귀환 오터치 위험, 반짝이는 배너에 묻힌 보스 공격 예고</td><td class="src">화면 설명</td></tr>
+<tr><td class="date">2026-10-04</td><td><a href="2026-10-04_task-header.html">작업 목록 헤더 (TaskHeader)</a></td><td><span class="n c">C 1</span><span class="n h">H 3</span><span class="n m">M 2</span></td><td class="verdict">생성 버튼이 같은 강조 버튼 사이에 묻히고 Delete All이 붙어 있어 오조작 위험</td><td class="src">React 코드</td></tr>
+      </tbody>
+    </table>
+  </div>
+</main>
+</body>
+</html>

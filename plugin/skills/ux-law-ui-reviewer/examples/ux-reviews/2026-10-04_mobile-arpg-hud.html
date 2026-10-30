@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>모바일 액션 RPG HUD UX 리뷰</title>
+<!-- ux-law-ui-reviewer v1 · 2026-10-04 · 모바일 액션 RPG 전투 HUD -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* Layout: 리뷰 시트 — 요약 밴드 → 문제 카드 목록 → 점검표·우선순위 → 예시 → 체크리스트, 960px 단일 컬럼 */
+:root{
+  --bg:#f4f6f8; --surface:#ffffff; --sunken:#eef1f5; --ink:#18212c; --muted:#5a6676; --line:#d9dfe7;
+  --accent:#2b4fa8; --accent-soft:#e6ecf8;
+  --crit:#b42318; --crit-bg:#fdecea; --high:#b54708; --high-bg:#fdf0e2;
+  --med:#7f6200; --med-bg:#f9f1d3; --low:#365a86; --low-bg:#e7eef7; --sug:#2c6b4c; --sug-bg:#e4f2ea;
+  --na:#5a6676; --na-bg:#eceff3;
+  --add:#1f6b3f; --add-bg:#e3f3e8; --del:#a12a1f; --del-bg:#fbe9e7;
+  --sans:"IBM Plex Sans KR",-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --r:6px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11161d; --surface:#18202a; --sunken:#0d1218; --ink:#e6ebf2; --muted:#9aa6b6; --line:#2b3644;
+  --accent:#8fb0ff; --accent-soft:#1d2a44;
+  --crit:#ff8f84; --crit-bg:#3a1916; --high:#ffb36e; --high-bg:#382413; --med:#e6c65c; --med-bg:#302810;
+  --low:#9fbde6; --low-bg:#1a2635; --sug:#86d1aa; --sug-bg:#14291e; --na:#9aa6b6; --na-bg:#222b37;
+  --add:#86d1aa; --add-bg:#14291e; --del:#ff8f84; --del-bg:#3a1916; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161d; --surface:#18202a; --sunken:#0d1218; --ink:#e6ebf2; --muted:#9aa6b6; --line:#2b3644;
+  --accent:#8fb0ff; --accent-soft:#1d2a44;
+  --crit:#ff8f84; --crit-bg:#3a1916; --high:#ffb36e; --high-bg:#382413; --med:#e6c65c; --med-bg:#302810;
+  --low:#9fbde6; --low-bg:#1a2635; --sug:#86d1aa; --sug-bg:#14291e; --na:#9aa6b6; --na-bg:#222b37;
+  --add:#86d1aa; --add-bg:#14291e; --del:#ff8f84; --del-bg:#3a1916; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:960px;margin:0 auto;padding-inline:20px;padding-block:32px 64px;display:grid;gap:40px}
+h1,h2,h3{margin:0;line-height:1.3;text-wrap:balance}
+h1{font-size:26px;font-weight:700}
+h2{font-size:18px;font-weight:700;display:flex;align-items:baseline;gap:10px}
+h2 .no{font:500 12px var(--mono);color:var(--muted);letter-spacing:.04em}
+h3{font-size:16px;font-weight:700}
+p{margin:0}
+ul{margin:0;padding-left:1.2em}
+code,.mono{font-family:var(--mono);font-size:.88em}
+code{background:var(--sunken);padding:1px 5px;border-radius:4px;overflow-wrap:anywhere}
+section{display:grid;gap:16px;min-width:0}
+.label{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* 헤더 */
+header{display:grid;gap:14px;border-bottom:1px solid var(--line);padding-bottom:24px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:13px;color:var(--muted)}
+.meta b{font-weight:500;color:var(--ink)}
+
+/* 요약 밴드 */
+.verdict{font-size:19px;line-height:1.55;font-weight:500;max-width:60ch}
+.counts{display:flex;flex-wrap:wrap;gap:8px}
+.sev{display:inline-flex;align-items:center;gap:6px;font:500 12px var(--mono);padding:3px 9px;border-radius:999px;white-space:nowrap}
+.sev::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.sev.critical{color:var(--crit);background:var(--crit-bg)} .sev.high{color:var(--high);background:var(--high-bg)}
+.sev.medium{color:var(--med);background:var(--med-bg)} .sev.low{color:var(--low);background:var(--low-bg)}
+.sev.suggestion{color:var(--sug);background:var(--sug-bg)}
+.sev .n{font-variant-numeric:tabular-nums}
+
+.action{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.action > div{display:grid;gap:10px;align-content:start;min-width:0}
+.action .task{font-size:17px;font-weight:700}
+.meter{display:flex;gap:4px;align-items:center}
+.meter i{width:28px;height:6px;border-radius:3px;background:var(--line)}
+.meter[data-level="low"] i:nth-child(1){background:var(--crit)}
+.meter[data-level="mid"] i:nth-child(-n+2){background:var(--med)}
+.meter[data-level="high"] i{background:var(--sug)}
+.meter span{margin-left:8px;font-weight:500;font-size:14px}
+.assume{font-size:13px;color:var(--muted);border-top:1px dashed var(--line);padding-top:10px}
+
+/* 필터 */
+.filters{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{font:500 12px var(--sans);border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:5px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip:focus-visible,.check input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* 문제 카드 */
+.issues{display:grid;gap:12px}
+.issue{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;display:grid;gap:12px;min-width:0}
+.issue-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.issue-head h3{flex:1 1 280px}
+.laws{display:flex;flex-wrap:wrap;gap:6px}
+.law{font-size:12px;color:var(--accent);background:var(--accent-soft);padding:2px 8px;border-radius:4px}
+.law.other{color:var(--muted);background:var(--na-bg)}
+.issue dl{margin:0;display:grid;grid-template-columns:7.5em minmax(0,1fr);gap:8px 16px}
+.issue dt{font-size:13px;color:var(--muted);padding-top:1px}
+.issue dd{margin:0;min-width:0}
+.issue dd.where{font-family:var(--mono);font-size:13px;overflow-wrap:anywhere}
+.issue dd.fix{background:var(--sunken);border-radius:4px;padding:10px 12px}
+
+/* 점검표 */
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;min-width:520px}
+th,td{text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--sunken)}
+td:first-child{font-weight:500;white-space:nowrap}
+.st{display:inline-block;font-size:12px;font-weight:500;padding:2px 8px;border-radius:4px;white-space:nowrap}
+.st-good{color:var(--sug);background:var(--sug-bg)} .st-improve{color:var(--med);background:var(--med-bg)}
+.st-bad{color:var(--crit);background:var(--crit-bg)} .st-na{color:var(--na);background:var(--na-bg)}
+.strengths{font-size:14px} .strengths b{font-weight:700}
+
+/* 우선순위 */
+.prio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.prio > div{border-top:3px solid var(--line);padding-top:12px;display:grid;gap:8px;align-content:start;min-width:0}
+.prio .now{border-color:var(--crit)} .prio .next{border-color:var(--med)} .prio .skip{border-color:var(--na)}
+.prio h3{font-size:15px}
+.prio li{margin-bottom:4px}
+.prio .skip li{color:var(--muted)}
+
+/* 적용 예시 */
+.compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+figure{margin:0;display:grid;gap:6px;min-width:0}
+figcaption{font:500 11px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+pre{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;overflow-x:auto;font:13px/1.55 var(--mono);color:var(--ink)}
+.after pre{border-color:var(--accent)}
+pre.diff span{display:block;padding-inline:6px;margin-inline:-6px}
+pre.diff .add{color:var(--add);background:var(--add-bg)} pre.diff .del{color:var(--del);background:var(--del-bg)}
+pre.diff .ctx{color:var(--muted)}
+.note{font-size:13px;color:var(--muted)}
+
+/* 체크리스트 */
+.checklist{list-style:none;padding:0;display:grid;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.check{display:flex;gap:12px;align-items:flex-start;padding:11px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+.checklist li:last-child .check{border-bottom:0}
+.check input{margin-top:5px;width:16px;height:16px;accent-color:var(--accent);flex:none}
+.check input:checked + span{color:var(--muted);text-decoration:line-through}
+.progress{font:500 12px var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+
+footer{font-size:12px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;display:grid;gap:4px}
+
+@media (max-width:640px){
+  .wrap{padding-inline:16px;gap:32px}
+  h1{font-size:22px}.verdict{font-size:17px}
+  .action,.prio,.compare{grid-template-columns:minmax(0,1fr)}
+  .issue{padding:16px}
+  .issue dl{grid-template-columns:minmax(0,1fr);gap:2px}
+  .issue dd{margin-bottom:8px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<main class="wrap">
+
+<header>
+  <span class="label">UX Law Review</span>
+  <h1>모바일 액션 RPG 전투 HUD</h1>
+  <div class="meta">
+    <span>대상 <b>필드·보스 전투 중 플레이어의 상태 확인·회피·스킬 사용</b></span>
+    <span>입력 <b>화면 설명(텍스트)</b></span>
+    <span>플랫폼 <b>모바일(iOS/Android) 터치, 가로 화면 추정</b></span>
+    <span>검토일 <b>2026-10-04</b></span>
+  </div>
+</header>
+
+<!-- 1. 한줄 평가 + 2. 핵심 행동 -->
+<section aria-labelledby="s1">
+  <h2 id="s1"><span class="no">01</span>한줄 평가</h2>
+  <p class="verdict">기본 배치는 장르 관례를 따르지만, 공격 버튼 바로 위 '마을 귀환' 버튼은 전투 중 오터치 위험이 크고, 계속 반짝이는 이벤트 배너가 얇은 빨간 원으로만 표시되는 보스 공격 예고보다 더 눈에 띄어 회피라는 핵심 행동을 방해한다.</p>
+  <div class="counts" id="counts" aria-label="심각도별 문제 수"></div>
+</section>
+
+<section aria-labelledby="s2">
+  <h2 id="s2"><span class="no">02</span>핵심 행동</h2>
+  <div class="action">
+    <div>
+      <span class="label">핵심 행동</span>
+      <p class="task">보스 공격 예고를 보고 조이스틱으로 회피한 뒤, 공격·스킬로 반격하기</p>
+      <span class="label">현재 발견 가능성</span>
+      <div class="meter" data-level="low"><i></i><i></i><i></i><span>낮음</span></div>
+      <p>공격 예고는 바닥의 얇은 빨간 원뿐인데, 화면 위쪽 가운데에서 이벤트 배너가 계속 반짝이며 시선을 먼저 가져간다.</p>
+    </div>
+    <div>
+      <span class="label">방해 요소</span>
+      <ul>
+        <li>계속 반짝이는 상단 중앙 이벤트 배너</li>
+        <li>항상 펼쳐진 5줄 퀘스트 목록(우상단)</li>
+        <li>공격 버튼 바로 위에 같은 크기로 있는 '마을 귀환' 버튼</li>
+        <li>40px 정도의 작은 스킬 버튼 6개가 하단 중앙에 가로 한 줄</li>
+      </ul>
+      <p class="assume"><b>가정</b> · 가로 화면, 두 손 엄지로 조작(왼손 조이스틱, 오른손 공격·스킬). '40px'은 기기 기준을 알 수 없어 pt/dp에 가까운 값으로 추정. 마을 귀환에 확인 단계나 시전 시간이 있는지는 설명에 없어서 즉시 실행된다고 가정. 저체력 경고 연출은 설명에 없어 판단하지 않음.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 3. 주요 문제 (심각도 높은 순) -->
+<section aria-labelledby="s3">
+  <h2 id="s3"><span class="no">03</span>주요 문제</h2>
+  <div class="filters" id="filters" role="group" aria-label="문제 필터"></div>
+  <div class="issues" id="issues">
+
+    <article class="issue" data-severity="critical" data-laws="fitts">
+      <div class="issue-head">
+        <span class="sev critical">Critical</span>
+        <h3>공격 버튼 바로 위에 같은 크기의 '마을 귀환' 버튼</h3>
+      </div>
+      <div class="laws"><span class="law">피츠의 법칙</span></div>
+      <dl>
+        <dt>위치/요소</dt><dd class="where">우하단 · 공격 버튼과 바로 위 '마을 귀환' 버튼</dd>
+        <dt>왜 문제인가</dt><dd>전투 중 가장 많이 누르는 공격 버튼 옆, 엄지가 빗나가기 쉬운 범위 안에 전투를 끝내 버리는 버튼이 같은 크기로 붙어 있다. 연타하다 엄지가 위로 밀리면 바로 귀환 버튼이 눌린다. 크기가 같아서 눈으로도 무게 차이가 없다.</dd>
+        <dt>사용자 영향</dt><dd>보스전 도중 의도치 않게 마을로 돌아가 전투 진행·버프·파티 참여를 잃을 수 있다. 플레이어가 가장 크게 불만을 느끼는 종류의 오작동이다.</dd>
+        <dt>수정 방법</dt><dd class="fix">'마을 귀환'을 전투 HUD에서 빼서 메뉴(일시정지/⋯)나 우상단 미니맵 옆 작은 아이콘으로 옮긴다. 전투 중에는 비활성화하거나 1~2초 길게 누르기 또는 확인 팝업을 붙인다. 하단에 꼭 남겨야 한다면 공격 버튼과 엄지 한 개 너비 이상 떼고, 크기를 줄이고 무채색으로 바꾼다(경험칙).</dd>
+      </dl>
+    </article>
+
+    <article class="issue" data-severity="high" data-laws="restorff other">
+      <div class="issue-head">
+        <span class="sev high">High</span>
+        <h3>보스 공격 예고가 바닥의 얇은 빨간 원 하나뿐</h3>
+      </div>
+      <div class="laws"><span class="law">폰 레스토프 효과</span><span class="law other">법칙 외 · 접근성(색각)</span></div>
+      <dl>
+        <dt>위치/요소</dt><dd class="where">화면 중앙 필드 바닥 · 보스 공격 예고 원</dd>
+        <dt>왜 문제인가</dt><dd>회피 판단에 가장 중요한 신호가 화면에서 가장 약한 표현(얇은 선, 색 하나)으로 되어 있다. 빨간 체력바·스킬 이펙트·타격 이펙트와 색이 겹쳐 눈에 띄지 않고, 빨강·초록을 구분하기 어려운 플레이어는 바닥 색과 섞여 놓칠 수 있다. 색 하나로만 정보를 전달하는 것도 문제다(WCAG SC 1.4.1).</dd>
+        <dt>사용자 영향</dt><dd>공격 범위나 타이밍을 늦게 알아채 피할 수 있었던 공격에 맞는다. 플레이어는 이를 실력 문제가 아니라 '불공정한 패턴'으로 느낀다.</dd>
+        <dt>수정 방법</dt><dd class="fix">예고 범위를 반투명하게 채우고, 바깥에서 안쪽으로 차오르는 진행 표시를 넣어 남은 시간을 보여 준다. 테두리를 굵게 하고, 위험 표시 전용 색이나 패턴(사선 해칭)을 정해 다른 이펙트에 쓰지 않는다. 대형 패턴에는 화면 가장자리 경고 표시와 효과음을 함께 낸다. 바닥과의 대비는 3:1 이상으로 맞춘다(WCAG SC 1.4.11 기준을 준용).</dd>
+      </dl>
+    </article>
+
+    <article class="issue" data-severity="high" data-laws="restorff hick">
+      <div class="issue-head">
+        <span class="sev high">High</span>
+        <h3>계속 반짝이는 이벤트 배너가 화면 위쪽 가운데를 차지</h3>
+      </div>
+      <div class="laws"><span class="law">폰 레스토프 효과</span><span class="law">힉의 법칙</span></div>
+      <dl>
+        <dt>위치/요소</dt><dd class="where">화면 위쪽 가운데 · 이벤트 배너(반짝임 애니메이션, 상시 표시)</dd>
+        <dt>왜 문제인가</dt><dd>움직이는 요소는 시선을 가장 강하게 끄는데, 전투와 무관한 마케팅 요소가 그 자리를 차지하고 있다. 강조가 위험 신호가 아니라 장식에 몰려 있고, 보스가 서는 위쪽 시야도 가린다.</dd>
+        <dt>사용자 영향</dt><dd>공격 예고와 보스 모션을 늦게 알아채고, 전투 내내 신경이 분산된다.</dd>
+        <dt>수정 방법</dt><dd class="fix">전투 중(보스 지역 진입, 적과 교전 중)에는 배너를 숨긴다. 평상시에도 반짝임 없이 우상단 퀘스트 아래 작은 아이콘과 알림 점으로 줄이고, 마을이나 메뉴에서만 펼쳐 보인다.</dd>
+      </dl>
+    </article>
+
+    <article class="issue" data-severity="medium" data-laws="fitts hick">
+      <div class="issue-head">
+        <span class="sev medium">Medium</span>
+        <h3>작은 스킬 버튼 6개가 하단 중앙에 가로 한 줄</h3>
+      </div>
+      <div class="laws"><span class="law">피츠의 법칙</span><span class="law">힉의 법칙</span></div>
+      <dl>
+        <dt>위치/요소</dt><dd class="where">하단 중앙 · 스킬 버튼 6개(각 약 40px, 단위 추정)</dd>
+        <dt>왜 문제인가</dt><dd>40px은 터치 최소 기준 44pt(Apple HIG)·48dp(Material)보다 작다. 하단 중앙은 오른손 엄지의 기준 위치(공격 버튼)에서 멀어서, 가운데·왼쪽 스킬을 쓰려면 엄지를 길게 옮겨야 하고 그동안 공격이 끊긴다. 6개가 같은 크기로 늘어서 있어 주력기와 보조기가 구분되지 않는다.</dd>
+        <dt>사용자 영향</dt><dd>옆 스킬을 잘못 누르거나 스킬을 늦게 쓰고, 쿨다운 확인을 위해 시선을 하단 중앙까지 옮겨야 한다.</dd>
+        <dt>수정 방법</dt><dd class="fix">스킬 버튼을 공격 버튼 주변에 부채꼴(반원)로 배치하고, 각 버튼을 최소 48dp/44pt 이상으로 키운다(Material/Apple HIG). 6개를 다 둘 수 없다면 주력 4개만 부채꼴에 두고 나머지 2개는 스와이프나 페이지 전환으로 바꾼다. 쿨다운은 버튼 위에 원형으로 덮어 표시한다.</dd>
+      </dl>
+    </article>
+
+    <article class="issue" data-severity="medium" data-laws="proximity restorff other">
+      <div class="issue-head">
+        <span class="sev medium">Medium</span>
+        <h3>체력·마나·경험치가 얇은 3줄로 같은 무게</h3>
+      </div>
+      <div class="laws"><span class="law">근접성의 법칙</span><span class="law">폰 레스토프 효과</span><span class="law other">법칙 외 · 색 의존</span></div>
+      <dl>
+        <dt>위치/요소</dt><dd class="where">좌상단 · 체력바(빨강) / 마나바(파랑) / 경험치바(노랑)</dd>
+        <dt>왜 문제인가</dt><dd>전투 중 계속 봐야 하는 체력과, 전투와 상관없는 경험치가 같은 두께로 붙어 있어 하나의 묶음처럼 보인다. 바가 얇아 남은 양을 한눈에 읽기 어렵고, 세 바를 색으로만 구분한다.</dd>
+        <dt>사용자 영향</dt><dd>체력을 확인하려다 다른 바와 헷갈리고, 위급한 순간 물약 사용이나 후퇴 판단이 늦어진다.</dd>
+        <dt>수정 방법</dt><dd class="fix">체력바를 가장 두껍게(마나의 약 2배, 경험칙) 하고 숫자나 아이콘을 함께 표시한다. 마나는 체력 바로 아래에 얇게 둔다. 경험치는 이 묶음에서 빼서 화면 맨 아래 가장자리에 1~2px 선으로 두거나 레벨 숫자 옆으로 옮긴다. 각 바 앞에 하트·물방울 같은 아이콘을 붙여 색만으로 구분하지 않게 한다(WCAG SC 1.4.1).</dd>
+      </dl>
+    </article>
+
+    <article class="issue" data-severity="medium" data-laws="hick proximity">
+      <div class="issue-head">
+        <span class="sev medium">Medium</span>
+        <h3>퀘스트 목록 5줄이 항상 펼쳐져 있음</h3>
+      </div>
+      <div class="laws"><span class="law">힉의 법칙</span><span class="law">근접성의 법칙</span></div>
+      <dl>
+        <dt>위치/요소</dt><dd class="where">우상단 · 미니맵 옆 퀘스트 목록(5줄 상시 펼침)</dd>
+        <dt>왜 문제인가</dt><dd>전투 중에는 필요 없는 글이 5줄이나 화면에 남아 있어, 미니맵을 볼 때 함께 읽히고 오른쪽 위 시야를 가린다. 지금 진행 중인 퀘스트가 어느 것인지도 구분되지 않는다.</dd>
+        <dt>사용자 영향</dt><dd>미니맵에서 적이나 목적지 위치를 찾는 데 시간이 걸리고, 화면이 복잡하게 느껴진다.</dd>
+        <dt>수정 방법</dt><dd class="fix">기본값을 '추적 중인 퀘스트 1줄'로 바꾸고 탭하면 펼치게 한다. 전투 중에는 자동으로 접는다. 목록은 미니맵 아래에 붙여 미니맵과는 다른 묶음으로 보이게 간격을 둔다.</dd>
+      </dl>
+    </article>
+
+    <article class="issue" data-severity="suggestion" data-laws="other">
+      <div class="issue-head">
+        <span class="sev suggestion">Suggestion</span>
+        <h3>HUD 배치·크기 사용자 설정</h3>
+      </div>
+      <div class="laws"><span class="law other">법칙 외 · 맞춤 설정</span></div>
+      <dl>
+        <dt>위치/요소</dt><dd class="where">설정 메뉴 · HUD 편집</dd>
+        <dt>왜 문제인가</dt><dd>기기 크기와 손 크기에 따라 엄지가 편하게 닿는 범위가 다르다(경험칙). 고정 배치로는 태블릿이나 작은 폰 사용자를 모두 맞추기 어렵다.</dd>
+        <dt>사용자 영향</dt><dd>자기 손에 맞게 버튼을 옮길 수 있으면 오터치와 피로가 줄어든다.</dd>
+        <dt>수정 방법</dt><dd class="fix">스킬·공격 버튼의 위치와 크기, HUD 투명도를 끌어서 조정할 수 있는 편집 화면을 두고, '기본값으로 되돌리기'를 함께 제공한다.</dd>
+      </dl>
+    </article>
+
+  </div>
+</section>
+
+<!-- 4. 법칙별 점검표 -->
+<section aria-labelledby="s4">
+  <h2 id="s4"><span class="no">04</span>UX 법칙별 점검표</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>법칙</th><th>평가</th><th>근거</th></tr></thead>
+      <tbody>
+        <tr><td>힉의 법칙</td><td><span class="st st-improve">개선 필요</span></td><td>전투와 무관한 퀘스트 5줄과 이벤트 배너가 항상 보이고, 스킬 6개가 우선순위 없이 같은 무게로 놓여 있다.</td></tr>
+        <tr><td>피츠의 법칙</td><td><span class="st st-bad">문제 있음</span></td><td>공격 버튼에 '마을 귀환'이 같은 크기로 붙어 있고, 40px 스킬 버튼은 최소 기준보다 작고 엄지 기준 위치에서 멀다.</td></tr>
+        <tr><td>제이콥의 법칙</td><td><span class="st st-good">양호</span></td><td>체력 좌상단, 미니맵 우상단, 조이스틱 좌하단, 공격 우하단은 모바일 액션 RPG에서 흔한 배치다.</td></tr>
+        <tr><td>근접성의 법칙</td><td><span class="st st-improve">개선 필요</span></td><td>체력·마나와 경험치가 한 묶음으로 보이고, 퀘스트 목록이 미니맵에 붙어 함께 읽힌다. 스킬과 공격 버튼은 떨어져 있다.</td></tr>
+        <tr><td>폰 레스토프 효과</td><td><span class="st st-bad">문제 있음</span></td><td>반짝이는 배너가 가장 튀고, 가장 중요한 공격 예고는 가장 약하게 표시된다. 빨강이 체력·예고에 함께 쓰여 의미가 겹친다.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="strengths"><b>잘 된 점</b> · 조이스틱(왼쪽 아래)과 공격 버튼(오른쪽 아래)을 양손 엄지 위치에 나눈 기본 구조. 체력과 미니맵을 관례 위치에 둔 덕분에 따로 배우지 않아도 된다.</p>
+</section>
+
+<!-- 5. 우선순위별 개선안 -->
+<section aria-labelledby="s5">
+  <h2 id="s5"><span class="no">05</span>우선순위별 개선안</h2>
+  <div class="prio">
+    <div class="now"><h3>이번 버전에 꼭 필요한 것</h3><ul><li>'마을 귀환'을 공격 버튼 옆에서 빼고, 전투 중에는 길게 누르기나 확인 단계를 붙인다</li><li>보스 공격 예고를 채움, 진행 표시, 굵은 테두리, 패턴으로 강화한다</li><li>전투 중 이벤트 배너를 숨기고 반짝임을 없앤다</li><li>스킬 버튼을 48dp/44pt 이상으로 키운다</li></ul></div>
+    <div class="next"><h3>다음 버전에서 개선해도 되는 것</h3><ul><li>스킬을 공격 버튼 둘레 부채꼴 배치로 바꾼다</li><li>체력바를 두껍게 하고 아이콘을 붙이며, 경험치바를 분리한다</li><li>퀘스트 목록 기본값을 1줄로 접고 전투 중에는 자동으로 접는다</li></ul></div>
+    <div class="skip"><h3>현재는 제외하는 것이 좋은 것</h3><ul><li>HUD 자유 편집 기능 — 구현과 QA 비용이 크고, 기본 배치를 먼저 고치면 대부분 해결된다</li><li>HUD 전면 리디자인(아트 스타일 변경 등) — 지금 문제는 위치·크기·강조 조정만으로 풀 수 있다</li></ul></div>
+  </div>
+</section>
+
+<!-- 6. 적용 예시 -->
+<section aria-labelledby="s6">
+  <h2 id="s6"><span class="no">06</span>적용 예시</h2>
+
+  <div class="compare">
+    <figure><figcaption>수정 전</figcaption><pre>┌──────────────────────────────────────────┐
+│ HP ━━━━━━━   ✦이벤트 배너✦   [맵] 퀘스트1 │
+│ MP ━━━━━━━   (반짝임 상시)        퀘스트2 │
+│ EXP━━━━━━━                       퀘스트3 │
+│                                  퀘스트4 │
+│                 [ 보스 ]          퀘스트5 │
+│                                          │
+│              ○ 얇은 빨간 원               │
+│                                 [귀환]   │
+│  (조이)   [s][s][s][s][s][s]     [공격]   │
+└──────────────────────────────────────────┘</pre></figure>
+    <figure class="after"><figcaption>수정 후</figcaption><pre>┌──────────────────────────────────────────┐
+│ ♥ HP ██████████ 820            [맵]   [≡] │
+│ ◆ MP ━━━━━━                ▸ 추적 퀘스트1 │
+│                                          │
+│                 [ 보스 ]                  │
+│        ! 화면 가장자리 경고 !             │
+│            ◉ 채움 + 차오르는 링           │
+│              + 사선 패턴                  │
+│                              [S1][S2]    │
+│  (조이)                    [S3] [공격]    │
+│                              [S4]        │
+│▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ EXP 1px ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁│
+└──────────────────────────────────────────┘
+ 귀환 → [≡] 메뉴 안, 전투 중 길게 누르기
+ 이벤트 배너 → 전투 중 숨김, [≡]에 알림 점</pre></figure>
+  </div>
+
+  <p class="note">수정 후 배치는 오른손 엄지가 공격 버튼에서 크게 움직이지 않고 주력 스킬 4개에 닿게 하고, 화면 가운데 위쪽 시야를 보스와 공격 예고에만 남기는 것이 목표다. 스킬 5·6번은 부채꼴 안에서 스와이프로 바꾸는 방식을 가정했다.</p>
+</section>
+
+<!-- 7. 최종 체크리스트 -->
+<section aria-labelledby="s7">
+  <h2 id="s7"><span class="no">07</span>최종 체크리스트 <span class="progress" id="progress"></span></h2>
+  <ul class="checklist" id="checklist">
+    <li><label class="check"><input type="checkbox" id="c1"><span>공격 버튼을 30초 동안 연타했을 때 '마을 귀환'이 한 번도 실행되지 않는가</span></label></li>
+    <li><label class="check"><input type="checkbox" id="c2"><span>전투 중 마을 귀환에 길게 누르기나 확인 단계가 있는가</span></label></li>
+    <li><label class="check"><input type="checkbox" id="c3"><span>보스전 화면을 3초 보여 줬을 때, 테스터가 공격 예고 범위를 가장 먼저 가리키는가</span></label></li>
+    <li><label class="check"><input type="checkbox" id="c4"><span>흑백(또는 색각 시뮬레이션)으로 봐도 공격 예고와 체력·마나바를 구분할 수 있는가</span></label></li>
+    <li><label class="check"><input type="checkbox" id="c5"><span>전투 중 화면에 반짝이거나 움직이는 이벤트 배너가 없는가</span></label></li>
+    <li><label class="check"><input type="checkbox" id="c6"><span>모든 스킬 버튼의 터치 영역이 48dp/44pt 이상인가</span></label></li>
+    <li><label class="check"><input type="checkbox" id="c7"><span>오른손 엄지를 공격 버튼에 둔 채로 주력 스킬에 닿는가</span></label></li>
+    <li><label class="check"><input type="checkbox" id="c8"><span>퀘스트 목록이 기본 1줄이고, 전투 중에는 자동으로 접히는가</span></label></li>
+  </ul>
+</section>
+
+<footer>
+  <span>심각도: Critical 주요 작업 실패·중대 오작동 · High 핵심 행동 혼란 · Medium 효율·가독성 저하 · Low 사소 · Suggestion 선택</span>
+  <span>수치 기준: Apple HIG 44pt · Material 48dp · WCAG 2.2 SC 2.5.8(24px)/2.5.5(44px) · SC 1.4.3 대비 4.5:1 · SC 1.4.11 3:1. "추정"·"경험칙" 표시는 근거가 약한 판단입니다.</span>
+</footer>
+
+</main>
+<script>
+(function(){
+  var SEV=[["critical","Critical"],["high","High"],["medium","Medium"],["low","Low"],["suggestion","Suggestion"]];
+  var LAW={hick:"힉",fitts:"피츠",jakob:"제이콥",proximity:"근접성",restorff:"폰 레스토프",other:"법칙 외"};
+  var issues=[].slice.call(document.querySelectorAll(".issue"));
+  // 심각도 개수
+  var counts=document.getElementById("counts");
+  SEV.forEach(function(s){
+    var n=issues.filter(function(el){return el.dataset.severity===s[0]}).length;
+    if(!n) return;
+    var b=document.createElement("span"); b.className="sev "+s[0];
+    b.innerHTML=s[1]+' <span class="n">'+n+'</span>'; counts.appendChild(b);
+  });
+  // 필터
+  var box=document.getElementById("filters"), active=null;
+  function chip(key,label){
+    var c=document.createElement("button"); c.type="button"; c.className="chip"; c.textContent=label;
+    c.setAttribute("aria-pressed", key===null?"true":"false"); c.dataset.key=key===null?"":key;
+    c.addEventListener("click",function(){
+      active=key; [].forEach.call(box.children,function(x){x.setAttribute("aria-pressed",x===c?"true":"false")});
+      issues.forEach(function(el){
+        var laws=(el.dataset.laws||"").split(/\s+/);
+        el.hidden = !(key===null || el.dataset.severity===key || laws.indexOf(key)>-1);
+      });
+    });
+    box.appendChild(c);
+  }
+  if(issues.length>1){
+    chip(null,"전체 "+issues.length);
+    SEV.forEach(function(s){ if(issues.some(function(el){return el.dataset.severity===s[0]})) chip(s[0],s[1]); });
+    Object.keys(LAW).forEach(function(k){ if(issues.some(function(el){return (el.dataset.laws||"").split(/\s+/).indexOf(k)>-1})) chip(k,LAW[k]); });
+  }
+  // 체크리스트 진행률
+  var boxes=[].slice.call(document.querySelectorAll("#checklist input")), prog=document.getElementById("progress");
+  function upd(){ prog.textContent = boxes.filter(function(b){return b.checked}).length+" / "+boxes.length; }
+  boxes.forEach(function(b){ b.addEventListener("change",upd); }); upd();
+})();
+</script>
+</body>
+</html>

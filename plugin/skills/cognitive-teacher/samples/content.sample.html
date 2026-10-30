@@ -1,0 +1,159 @@
+<!-- cognitive-teacher 콘텐츠 조각 샘플 — template.html 의 .sheet 안에 삽입된다.
+     html/head/body 래퍼도, .sheet 래퍼도, footer 도 넣지 않는다.
+     아래의 프로젝트(cakeshop)·테이블·코드는 설명용으로 지어낸 가상의 예시다. -->
+
+<!-- ── 시험지 헤더 ─────────────────────────────── -->
+<header class="exam-header">
+  <div class="exam-meta">
+    <span>과목 <b>cakeshop</b></span>
+    <span>단원 <b>3. worker 모드 주문 파이프라인</b></span>
+    <span>예상 학습 <b>20분</b></span>
+    <span>날짜 <b>2026-08-06</b></span>
+    <span>이름 <span class="name-blank"></span></span>
+  </div>
+  <h1 class="exam-title">
+    주문 한 건이 구워지기까지
+    <span class="subtitle">주제 모드 샘플 · 가상의 프로젝트 예시입니다</span>
+  </h1>
+  <div class="goals-label">학습 목표</div>
+  <ul class="goals">
+    <li><input type="checkbox" id="g1"><label for="g1">worker 모드가 무엇을 폴링하는지 말할 수 있다</label></li>
+    <li><input type="checkbox" id="g2"><label for="g2">claim이 왜 필요한지 설명할 수 있다</label></li>
+    <li><input type="checkbox" id="g3"><label for="g3">정기 주문이 어떻게 큐에 들어오는지 설명할 수 있다</label></li>
+  </ul>
+</header>
+
+<!-- ── 1. 배경 ────────────────────────────────── -->
+<section class="chapter" data-kind="background">
+  <div class="chapter-tab">1</div>
+  <h2><span class="eyebrow">배경</span>worker 모드 이전에는 어떻게 돌아갔나</h2>
+  <p>초기의 cakeshop은 프로세스를 직접 띄워 그날의 주문을 한 번에 굽고 종료하는 구조였습니다. 실행 시점은 전적으로 CronJob 스케줄에 묶여 있었고, 손님이 앱에서 "지금 바로 구워줘"라고 요청할 방법이 없었습니다.</p>
+  <details class="bg">
+    <summary>이 부분을 이미 알고 있다면 접어두세요 — 직접 실행 모드의 한계 (2문단)</summary>
+    <div class="bg-body">
+      <p>직접 실행 모드에서는 급한 주문이 들어와도 사람이 수동으로 굽기 파이프라인을 돌려야 했습니다. API 서버는 주문을 받아도 굽기 프로세스에 전달할 통로가 없었기 때문입니다.</p>
+      <p>그래서 도입된 것이 <mark>주문을 DB 테이블에 쌓고, 상시 구동 worker가 그걸 집어가는 큐 구조</mark>입니다. API와 worker는 서로를 직접 호출하지 않고 <code>bake_orders</code> 테이블만 공유합니다.</p>
+    </div>
+  </details>
+  <p>이 문서가 다루는 것은 그 큐 구조, 즉 <code>CAKESHOP_RUN_MODE=worker</code>가 기본이 된 현재의 파이프라인입니다.</p>
+</section>
+
+<!-- ── 2. 직관 ────────────────────────────────── -->
+<section class="chapter" data-kind="intuition">
+  <div class="chapter-tab">2</div>
+  <h2><span class="eyebrow">직관</span>이 구조의 본질 한 줄</h2>
+  <p><mark>worker 모드의 본질은 "주문하는 쪽"과 "굽는 쪽"의 분리입니다.</mark> 매장에 비유하면 카운터(API)는 주문서를 주문대에 꽂기만 하고, 주방(worker)은 자기 리듬으로 주문대를 확인하며 주문서를 하나씩 집어갑니다. 카운터가 주방에 직접 소리치지 않으므로, 주방이 바쁘든 재시작 중이든 주문은 유실되지 않습니다.</p>
+  <div class="side-note">정기 주문(매일 아침 식빵 50개)도 같은 주문대를 씁니다 — CronJob은 enqueue 모드로 "주문서를 꽂는 역할"만 하고, 굽는 일은 언제나 worker의 몫입니다.</div>
+  <div class="key-box">
+    <ul>
+      <li>API는 <code>bake_orders</code>에 행을 <b>넣기만</b> 한다</li>
+      <li>worker는 이 테이블을 <b>폴링</b>해서 주문을 집어간다 (claim)</li>
+      <li>정기 주문 = worker 내장 스케줄러 + enqueue 모드 CronJob</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ── 3. 피규어 ──────────────────────────────── -->
+<section class="chapter" data-kind="figure">
+  <div class="chapter-tab">3</div>
+  <h2><span class="eyebrow">직접 돌려보기</span>폴링 한 사이클</h2>
+  <p>아래 버튼으로 worker의 폴링 사이클을 한 스텝씩 진행해보세요. 주문 행의 상태가 어떻게 바뀌는지가 핵심입니다.</p>
+  <figure class="figure">
+    <figcaption><b>인터랙티브</b> · WORKER POLLING CYCLE — 실브라우저에서 실제로 동작합니다</figcaption>
+    <div class="stages" id="stages">
+      <span class="stage on">① 폴링</span><span class="stage-arrow">→</span>
+      <span class="stage">② claim</span><span class="stage-arrow">→</span>
+      <span class="stage">③ 굽기</span><span class="stage-arrow">→</span>
+      <span class="stage">④ 결과 기록</span><span class="stage-arrow">→</span>
+      <span class="stage">⑤ 다음 폴링</span>
+    </div>
+    <div class="fig-state" id="figState">bake_orders<br>┌ id=482 · status=<span class="hl">queued</span> · ordered_by=customer-7<br>└ worker: 대기 중 — 새 주문이 있는지 확인한다</div>
+    <div class="fig-controls">
+      <button type="button" id="prevBtn">◂ 이전</button>
+      <button type="button" id="nextBtn">다음 ▸</button>
+      <span class="step-label" id="stepLabel">1 / 5 단계</span>
+    </div>
+  </figure>
+</section>
+
+<!-- ── 4. 코드 읽기 ───────────────────────────── -->
+<section class="chapter" data-kind="walkthrough">
+  <div class="chapter-tab">4</div>
+  <h2><span class="eyebrow">코드 읽기</span>claim은 왜 이렇게 생겼나</h2>
+  <p>두 worker가 동시에 같은 주문을 집으면 같은 케이크가 두 번 구워집니다. 이를 막는 것이 claim 쿼리이고, 서사의 순서상 <mark>가장 먼저 읽어야 할 코드는 잠금 선점 부분</mark>입니다. (아래는 가상의 예시 diff입니다)</p>
+  <div class="code-walk">
+    <div class="code-file">cakeshop/worker/claim.py</div>
+    <pre class="diff"><span class="hunk">@@ -41,6 +41,9 @@ def claim_next_order(session):</span>
+<span class="ln">     stmt = (</span>
+<span class="ln">         select(BakeOrder)</span>
+<span class="ln">         .where(BakeOrder.status == "queued")</span>
+<span class="ln add">+        .order_by(BakeOrder.created_at)</span>
+<span class="ln add">+        .with_for_update(skip_locked=True)</span>
+<span class="ln del">-        .limit(1)</span>
+<span class="ln add">+        .limit(1)  # 잠긴 행은 건너뛰고 첫 주문만</span>
+<span class="ln">     )</span></pre>
+  </div>
+  <p><code>skip_locked</code>가 이 구조의 안전핀입니다. 다른 worker가 이미 잡은 행은 기다리지 않고 건너뛰므로, worker 수를 늘려도 같은 주문이 중복으로 구워지지 않습니다.</p>
+  <figure class="figure">
+    <figcaption><b>흐름</b> · 주문의 여정 — mermaid 렌더 (팔레트 테마 통일)</figcaption>
+<pre class="mermaid">
+graph LR
+  A["cakeshop_api<br/>POST /bake-orders"] --> B["bake_orders<br/>status: queued"]
+  B --> C["worker<br/>polling + claim"]
+  C --> D["oven<br/>굽기 파이프라인 실행"]
+</pre>
+  </figure>
+</section>
+
+<!-- ── 5. 확인 문제 ───────────────────────────────
+     문항 DOM 과 채점판은 템플릿의 퀴즈 렌더러가 quiz-data 로부터 생성한다.
+     조각에는 섹션 골격 + quiz-data JSON 만 둔다. -->
+<section class="chapter" data-kind="quiz">
+  <div class="chapter-tab">5</div>
+  <h2><span class="eyebrow">확인 문제</span>읽었다고 착각하지 않기</h2>
+  <p class="quiz-intro">답을 고르면 바로 채점됩니다. 점수는 첫 시도 기준입니다.</p>
+</section>
+<script type="application/json" id="quiz-data">
+[
+  { "question": "앱에서 주문이 들어왔을 때 worker가 폴링하는 것은 무엇인가?",
+    "options": ["cakeshop_api의 webhook 엔드포인트", "bake_orders 테이블", "Redis pub/sub 채널", "S3 주문 버킷"],
+    "answerIndex": 1,
+    "explanation": "API와 worker는 서로를 직접 호출하지 않고 bake_orders 테이블만 공유합니다. 이 간접 구조 덕분에 worker가 재시작 중이어도 주문이 유실되지 않습니다. (§2 직관)" },
+  { "question": "worker를 2개로 늘려도 같은 주문이 두 번 구워지지 않는 이유는?",
+    "options": ["폴링 주기를 서로 다르게 설정하기 때문", "claim 시 행 잠금 + skip_locked로 선점하기 때문", "CronJob이 worker마다 주문을 배분하기 때문", "주문 처리 후 테이블을 비우기 때문"],
+    "answerIndex": 1,
+    "explanation": "claim 쿼리의 with_for_update(skip_locked=True)가 잠긴 행을 건너뛰게 하므로, 한 주문은 정확히 한 worker에게만 선점됩니다. (§4 코드 읽기)" },
+  { "question": "매일 아침 식빵 50개 같은 정기 주문은 worker 모드에서 어떻게 실행되는가?",
+    "options": ["CronJob이 굽기 파이프라인을 직접 실행한다", "CronJob은 enqueue만 하고 굽기는 worker가 한다", "worker가 cron 표현식을 파싱해 직접 스케줄링만 한다", "정기 주문은 worker 모드에서 지원되지 않는다"],
+    "answerIndex": 1,
+    "explanation": "정기 주문 = worker 내장 스케줄러 + enqueue 모드 CronJob. 굽는 주체는 언제나 worker입니다. (§2 사이드노트)" }
+]
+</script>
+
+<script>
+  // ── 피규어: 폴링 사이클 스텝 ──────────────────────────
+  (function () {
+    var steps = [
+      'bake_orders<br>┌ id=482 · status=<span class="hl">queued</span> · ordered_by=customer-7<br>└ worker: 대기 중 — 새 주문이 있는지 확인한다',
+      'bake_orders<br>┌ id=482 · status=<span class="hl">claimed</span> · claimed_by=worker-1<br>└ FOR UPDATE SKIP LOCKED — 다른 worker는 이 행을 건너뛴다',
+      'bake_orders<br>┌ id=482 · status=<span class="hl">baking</span> · batch_id=b-20260806-01<br>└ oven이 굽기 파이프라인 실행 중 (반죽 → 굽기 → 포장)',
+      'bake_orders<br>┌ id=482 · status=<span class="hl">done</span> · finished_at=14:02:31<br>└ 결과는 bake_results에 기록 — 앱 화면에서 확인 가능',
+      'bake_orders<br>┌ (빈 큐)<br>└ worker: 다음 폴링까지 대기 — 사이클은 여기서 다시 시작된다'
+    ];
+    var i = 0;
+    var state = document.getElementById('figState');
+    var label = document.getElementById('stepLabel');
+    var stages = document.querySelectorAll('#stages .stage');
+    function render() {
+      state.innerHTML = steps[i];
+      label.textContent = (i + 1) + ' / ' + steps.length + ' 단계';
+      stages.forEach(function (s, k) { s.classList.toggle('on', k === i); });
+    }
+    document.getElementById('nextBtn').addEventListener('click', function () {
+      i = Math.min(i + 1, steps.length - 1); render();
+    });
+    document.getElementById('prevBtn').addEventListener('click', function () {
+      i = Math.max(i - 1, 0); render();
+    });
+  })();
+</script>

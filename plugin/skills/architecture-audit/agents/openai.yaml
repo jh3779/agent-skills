@@ -1,0 +1,4 @@
+interface:
+  display_name: "Architecture Audit"
+  short_description: "Audit design soundness — data lifecycle, API contracts, state machines, trust boundaries"
+  default_prompt: "Use $architecture-audit to audit this project's design (schema lifecycle, API contracts, state machines, failure handling, trust boundaries) and report findings with evidence."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Handoff"
+  short_description: "Save/resume project state across sessions via .agent/ docs"
+  default_prompt: "Use $handoff to checkpoint or resume this project's .agent/ state (PROJECT_CONTEXT.md, HANDOFF.md, DECISIONS.md)."

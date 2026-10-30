@@ -1,0 +1,4 @@
+interface:
+  display_name: "Web Reach"
+  short_description: "Fetch YouTube transcripts and RSS/Atom feed entries"
+  default_prompt: "Use $web-reach for this task."

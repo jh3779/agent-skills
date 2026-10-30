@@ -1,0 +1,14 @@
+.task-header { padding: 8px; }
+.title { display: inline; font-size: 16px; }
+.badge { margin-left: 4px; padding: 2px 6px; font-size: 10px; color: #fff; animation: blink 1s infinite; }
+.badge.new { background: #ff2d55; }
+.badge.hot { background: #ff9500; }
+.toolbar { display: flex; gap: 2px; margin-top: 4px; }
+.btn { padding: 4px 6px; font-size: 12px; border: none; }
+.btn.primary { background: #4f7cff; color: #dfe6ff; }
+.icon { font-size: 14px; cursor: pointer; }
+.filters { margin-top: 4px; }
+.filters label { color: #aaa; margin-right: 6px; font-size: 11px; }
+.filters select { margin-right: 6px; }
+button:focus { outline: none; }
+@keyframes blink { 50% { opacity: 0.3; } }
