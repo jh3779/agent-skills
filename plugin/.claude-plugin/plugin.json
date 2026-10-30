@@ -1,0 +1,10 @@
+{
+  "name": "agent-skills",
+  "version": "0.1.0",
+  "description": "코드·설계 점검, 리뷰, 학습, 기획·발표, 세션 인계용 스킬 13종",
+  "author": { "name": "jh3779" },
+  "homepage": "https://github.com/jh3779/agent-skills",
+  "repository": "https://github.com/jh3779/agent-skills",
+  "license": "MIT",
+  "keywords": ["audit", "code-review", "learning", "planning", "handoff"]
+}

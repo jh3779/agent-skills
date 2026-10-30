@@ -1,0 +1,14 @@
+{
+  "name": "jh3779-skills",
+  "description": "코드·설계 점검, 리뷰, 학습, 기획·발표, 세션 인계용 스킬 13종",
+  "owner": {
+    "name": "jh3779"
+  },
+  "plugins": [
+    {
+      "name": "agent-skills",
+      "source": "./plugin",
+      "description": "코드·설계 점검, 리뷰, 학습, 기획·발표, 세션 인계용 스킬 13종"
+    }
+  ]
+}

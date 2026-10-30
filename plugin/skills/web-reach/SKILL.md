@@ -7,7 +7,7 @@ metadata:
 
 # Web Reach — YouTube / RSS access via trusted tools only
 
-> **`$SKILL_DIR`** = 이 `SKILL.md`가 들어 있는 폴더의 절대경로(플러그인 설치본 안). 모르면 `find ~/.codex -path '*/web-reach/SKILL.md'`로 찾아 그 상위 폴더를 쓴다.
+> **`$SKILL_DIR`** = 이 `SKILL.md`가 들어 있는 폴더의 절대경로(플러그인 설치본 안). Claude Code는 스킬을 불러올 때 "Base directory for this skill"로 알려 준다. 모르면 `find ~/.claude ~/.codex -path '*/web-reach/SKILL.md'`로 찾아 그 상위 폴더를 쓴다.
 
 ## When to Use
 

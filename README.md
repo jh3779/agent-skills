@@ -1,10 +1,14 @@
 # agent-skills
 
-Codex에서 쓰는 업무용 스킬 13종 묶음입니다. 코드·설계 점검, 리뷰 작성, 학습, 기획·발표 준비, 세션 인계를 다룹니다.
+Codex와 Claude Code에서 쓰는 업무용 스킬 13종 묶음입니다. 코드·설계 점검, 리뷰 작성, 학습, 기획·발표 준비, 세션 인계를 다룹니다.
 
 디자인 스킬(요구사항·스타일 인터뷰와 UI 템플릿 8종)은 별도 저장소 [design-templates](https://github.com/jh3779/design-templates)에 있습니다.
 
 ## 설치
+
+아래 명령은 Codex나 Claude Code를 **실행한 채로 그 안에 입력하는 것이 아니라**, 일반 터미널(macOS 터미널, iTerm, VS Code 터미널 등)에 입력합니다. 어느 폴더에서 실행해도 되고, 한 번 설치하면 모든 프로젝트에서 쓸 수 있습니다.
+
+### Codex
 
 ```bash
 codex plugin marketplace add jh3779/agent-skills
@@ -13,9 +17,30 @@ codex plugin add agent-skills@agent-skills
 
 설치한 뒤 Codex를 재시작합니다. `codex plugin list`에서 `agent-skills@agent-skills`가 `installed, enabled`로 보이면 설치가 끝난 것입니다.
 
+### Claude Code
+
+Claude Code에서는 `agent-skills`라는 마켓플레이스 이름이 Anthropic 공식용으로 예약돼 있어서, 마켓플레이스 이름이 **`jh3779-skills`** 입니다(플러그인 이름은 그대로 `agent-skills`).
+
+터미널에서:
+
+```bash
+claude plugin marketplace add jh3779/agent-skills
+claude plugin install agent-skills@jh3779-skills
+```
+
+또는 Claude Code 대화창 안에서 슬래시 명령으로:
+
+```
+/plugin install agent-skills --marketplace jh3779/agent-skills
+```
+
+설치한 뒤 Claude Code를 재시작합니다. `claude plugin list`에서 `agent-skills@jh3779-skills`가 `enabled`로 보이면 설치가 끝난 것입니다.
+
 ## 사용
 
-스킬마다 설명에 적힌 상황이 되면 Codex가 알아서 꺼내 씁니다. 이름으로 직접 부를 수도 있습니다(예: `$structure-audit 이 프로젝트 점검해줘`).
+스킬마다 설명에 적힌 상황이 되면 Codex나 Claude Code가 알아서 꺼내 씁니다. 이름으로 직접 부를 수도 있습니다.
+- Codex: `$structure-audit 이 프로젝트 점검해줘`
+- Claude Code: `/agent-skills:structure-audit` (스킬 이름 앞에 플러그인 이름이 붙습니다)
 
 ## 스킬 목록
 
@@ -45,6 +70,10 @@ codex plugin add agent-skills@agent-skills
 
 ```bash
 codex plugin marketplace upgrade agent-skills
+```
+
+```bash
+claude plugin marketplace update jh3779-skills && claude plugin update agent-skills@jh3779-skills
 ```
 
 ## 참고
